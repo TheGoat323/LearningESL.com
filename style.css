@@ -1,0 +1,76 @@
+body, html {
+    margin: 0; padding: 0;
+    height: 100%; width: 100%;
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0f1115; color: #e4e6eb;
+    overflow: hidden;
+}
+
+#desktop {
+    width: 100vw; height: calc(100vh - 50px);
+    position: relative;
+    background: radial-gradient(circle, #1e212a 0%, #0f1115 100%);
+}
+
+/* Window Styling */
+.window {
+    position: absolute;
+    width: 320px;
+    background: #181a20;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid #2e3340;
+    z-index: 10;
+    display: block; /* Windows are visible by default */
+}
+
+.window-header {
+    background: #22252e;
+    padding: 10px 15px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    cursor: move;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.close-btn {
+    background: #ff5f56; border: none; color: white;
+    border-radius: 50%; width: 20px; height: 20px; cursor: pointer;
+}
+
+.window-content { padding: 20px; }
+
+/* OS Form Elements */
+.os-form { display: flex; gap: 5px; margin-bottom: 15px; }
+input { 
+    flex: 1; padding: 8px; border-radius: 6px; 
+    border: 1px solid #2e3340; background: #0f1115; color: white; 
+}
+button { 
+    padding: 8px 15px; background: #6366f1; border: none; 
+    color: white; border-radius: 6px; cursor: pointer; 
+}
+
+.quick-links a {
+    color: #888; text-decoration: none; margin-right: 10px; font-size: 12px;
+}
+
+/* Taskbar */
+#taskbar {
+    height: 50px; background: #181a20; position: fixed; bottom: 0;
+    width: 100%; display: flex; align-items: center; padding: 0 15px;
+    border-top: 1px solid #2e3340; box-sizing: border-box;
+}
+
+.start-btn { margin-right: 10px; background: #2e3340; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; }
+#clock { margin-left: auto; color: #888; font-size: 14px; }
+
+/* Audio Player */
+audio { width: 100%; margin-top: 10px; }
+.custom-upload {
+    display: block; background: #2e3340; text-align: center;
+    padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+#fileInput { display: none; }
