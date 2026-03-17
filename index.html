@@ -1,207 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Dashboard</title>
-<style>
-    body {
-        margin: 0;
-        font-family: system-ui, -apple-system, sans-serif;
-        background: #0f1115;
-        color: #e4e6eb;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+// --- Configuration & Persistence ---
+// This lets you change your proxy URL via the browser console or a prompt 
+// without editing the HTML file every time.
+let PROXY_BASE_URL = localStorage.getItem('proxy_url') || 'https://api.codetabs.com/v1/proxy?quest='; 
+
+// --- Proxy & Smart Search Logic ---
+const proxyForm = document.getElementById('proxyForm');
+const proxyInput = document.getElementById('proxyInput');
+
+proxyForm.addEventListener('submit', function(e) {
+    e.preventDefault();
     
-    .container {
-        background: #181a20;
-        padding: 40px;
-        border-radius: 16px;
-        width: 360px;
-        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
-        text-align: center;
-    }
+    let input = proxyInput.value.trim();
+    if (!input) return;
 
-    h1 {
-        font-size: 24px;
-        margin-bottom: 5px;
-        font-weight: 600;
-    }
-
-    .clock {
-        font-size: 14px;
-        color: #888;
-        margin-bottom: 25px;
-    }
-
-    /* --- New Proxy Search Bar Styles --- */
-    .proxy-form {
-        display: flex;
-        margin-bottom: 25px;
-        gap: 8px;
-    }
-
-    .proxy-input {
-        flex: 1;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #2e3340;
-        background: #22252e;
-        color: #fff;
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    .proxy-input:focus {
-        border-color: #6366f1;
-    }
-
-    .proxy-btn {
-        background: #2e3340;
-        color: white;
-        border: none;
-        padding: 0 16px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .proxy-btn:hover {
-        background: #6366f1;
-    }
-    /* ----------------------------------- */
-
-    .links-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: 25px;
-    }
-
-    a {
-        display: block;
-        background: #22252e;
-        color: #e4e6eb;
-        text-decoration: none;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #2e3340;
-        transition: all 0.2s ease;
-    }
-
-    a:hover {
-        background: #2e3340;
-        border-color: #6366f1;
-        transform: translateY(-2px);
-    }
-
-    input[type="file"] {
-        display: none;
-    }
-
-    .custom-file-upload {
-        display: inline-block;
-        background: #6366f1;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        transition: background 0.2s;
-        margin-bottom: 15px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .custom-file-upload:hover {
-        background: #4f46e5;
-    }
-
-    audio {
-        width: 100%;
-        border-radius: 8px;
-        outline: none;
-    }
-</style>
-</head>
-<body>
-
-<div class="container">
-    <h1>Welcome Back</h1>
-    <div class="clock" id="clock">00:00:00</div>
-
-    <form class="proxy-form" id="proxyForm">
-        <input type="text" id="proxyInput" class="proxy-input" placeholder="Enter URL to unblock..." required>
-        <button type="submit" class="proxy-btn">Go</button>
-    </form>
-
-    <div class="links-grid">
-        <a href="https://google.com" target="_blank">🔍 Google Search</a>
-        <a href="https://youtube.com" target="_blank">▶️ YouTube</a>
-    </div>
-
-    <label for="fileInput" class="custom-file-upload">
-        🎵 Select Audio File
-    </label>
-    <input type="file" id="fileInput" accept="audio/*">
+    let finalUrl = "";
     
-    <audio id="audioPlayer" controls></audio>
-</div>
+    // Check if the input looks like a URL (contains a dot and no spaces)
+    const isUrl = input.includes('.') && !input.includes(' ');
 
-<script>
-    // --- Proxy Search Logic ---
-    const proxyForm = document.getElementById('proxyForm');
-    const proxyInput = document.getElementById('proxyInput');
-
-    proxyForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevents the page from refreshing
-        
-        let urlToUnblock = proxyInput.value.trim();
-        
-        // Ensure the URL starts with http:// or https://
-        if (!urlToUnblock.startsWith('http://') && !urlToUnblock.startsWith('https://')) {
-            urlToUnblock = 'https://' + urlToUnblock;
+    if (isUrl) {
+        // Ensure protocol exists
+        if (!input.startsWith('http://') && !input.startsWith('https://')) {
+            input = 'https://' + input;
         }
-
-        // REPLACE THIS URL with your actual web proxy link!
-        const PROXY_BASE_URL = 'https://your-proxy-link.com/?url='; 
-        
-        // Combines the proxy URL with the site you want to visit
-        const finalUrl = PROXY_BASE_URL + encodeURIComponent(urlToUnblock);
-        
-        // Opens the unblocked site in a new tab
-        window.open(finalUrl, '_blank');
-        
-        proxyInput.value = ''; // Clears the search bar
-    });
-
-    // --- Audio Player Logic ---
-    const fileInput = document.getElementById('fileInput');
-    const audioPlayer = document.getElementById('audioPlayer');
-
-    fileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            const fileURL = URL.createObjectURL(file);
-            audioPlayer.src = fileURL;
-            audioPlayer.play();
-        }
-    });
-
-    // --- Live Clock Logic ---
-    function updateClock() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('clock').textContent = timeString;
+        finalUrl = PROXY_BASE_URL + encodeURIComponent(input);
+    } else {
+        // It's a search term, send to Google
+        finalUrl = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
     }
-    
-    setInterval(updateClock, 1000);
-    updateClock();
-</script>
 
-</body>
-</html>
+    window.open(finalUrl, '_blank');
+    proxyInput.value = ''; 
+});
+
+// --- Audio Player Logic ---
+const fileInput = document.getElementById('fileInput');
+const audioPlayer = document.getElementById('audioPlayer');
+
+fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const fileURL = URL.createObjectURL(file);
+        audioPlayer.src = fileURL;
+        audioPlayer.play();
+        // Optional: Update title to file name
+        document.querySelector('h1').textContent = "Now Playing: " + file.name.substring(0, 15) + "...";
+    }
+});
+
+// --- Live Clock Logic ---
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit' 
+    });
+}
+
+setInterval(updateClock, 1000);
+updateClock();
