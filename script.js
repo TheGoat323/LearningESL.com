@@ -1,5 +1,5 @@
 // Change this to the URL you got from Render/Koyeb
-const PROXY_SERVER_URL = "https://my-proxy-engine.onrender.com/service/";
+const PROXY_SERVER_URL = "https://api.render.com/deploy/srv-d6sfgn7fte5s73f74ftg?key=E4u3Kl5wcIs";
 
 document.getElementById('proxyForm').addEventListener('submit', function(e) {
     e.preventDefault();
