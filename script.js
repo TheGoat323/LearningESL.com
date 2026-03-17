@@ -1,54 +1,46 @@
-// --- 1. Window Dragging Logic ---
-document.querySelectorAll('.window-header').forEach(header => {
-    header.onmousedown = function(e) {
-        let win = header.parentElement;
-        let shiftX = e.clientX - win.getBoundingClientRect().left;
-        let shiftY = e.clientY - win.getBoundingClientRect().top;
+// Change this to the URL you got from Render/Koyeb
+const PROXY_SERVER_URL = "https://my-proxy-engine.onrender.com/service/";
 
-        // Bring clicked window to front
-        document.querySelectorAll('.window').forEach(w => w.style.zIndex = "10");
-        win.style.zIndex = "100";
-
-        function moveAt(pageX, pageY) {
-            win.style.left = pageX - shiftX + 'px';
-            win.style.top = pageY - shiftY + 'px';
-        }
-
-        function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
-
-        document.addEventListener('mousemove', onMouseMove);
-
-        document.onmouseup = function() {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.onmouseup = null;
-        };
-    };
-});
-
-// --- 2. Toggle Apps (Show/Hide) ---
-function toggleApp(id) {
-    const win = document.getElementById(id);
-    win.style.display = (win.style.display === "none") ? "block" : "none";
-}
-
-// --- 3. Proxy/Search Logic ---
 document.getElementById('proxyForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    let input = document.getElementById('proxyInput').value;
-    let url = input.includes('.') ? "https://" + input : "https://www.google.com/search?q=" + input;
-    window.open(url, '_blank');
-});
-
-// --- 4. Audio Logic ---
-document.getElementById('fileInput').addEventListener('change', function() {
-    const file = this.files[0];
-    if (file) {
-        document.getElementById('audioPlayer').src = URL.createObjectURL(file);
-        document.getElementById('audioPlayer').play();
+    let input = document.getElementById('proxyInput').value.trim();
+    
+    // 1. Fix the URL if it's just a search
+    let targetUrl;
+    if (input.includes('.') && !input.includes(' ')) {
+        targetUrl = input.startsWith('http') ? input : 'https://' + input;
+    } else {
+        targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
     }
+
+    // 2. Encode the URL for the proxy engine
+    // Most proxies use a specific encoding (Ultraviolet uses XOR or Base64)
+    // For a simple setup, we just append it to our service URL
+    const finalProxyUrl = PROXY_SERVER_URL + btoa(targetUrl); 
+
+    // 3. Open the proxied site
+    // To stay "inside" your OS, we should open it in an Iframe
+    openInWindow(finalProxyUrl);
 });
 
-// --- 5. Clock ---
-setInterval(() => {
-    document.getElementById('clock').textContent = new Date().toLocaleTimeString();
-}, 1000);
+function openInWindow(url) {
+    // This creates a new 'Window' div with an <iframe> inside it
+    const desktop = document.getElementById('desktop');
+    const browserWin = document.createElement('div');
+    browserWin.className = 'window';
+    browserWin.style.width = "80%";
+    browserWin.style.height = "70%";
+    browserWin.style.top = "50px";
+    browserWin.style.left = "10%";
+
+    browserWin.innerHTML = `
+        <div class="window-header">
+            <span>🌐 Browser</span>
+            <button class="close-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+        <div class="window-content" style="height: calc(100% - 40px); padding: 0;">
+            <iframe src="${url}" style="width:100%; height:100%; border:none; border-radius: 0 0 12px 12px;"></iframe>
+        </div>
+    `;
+    desktop.appendChild(browserWin);
+}
